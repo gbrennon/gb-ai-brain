@@ -1,0 +1,58 @@
+[project]
+name = "gb-ai-brain"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Glauber Brennon", email = "glauberbrennon@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "pyyaml>=6.0.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-cov>=5.0.0",
+]
+
+[project.scripts]
+gb-ai-brain = "gb_ai_brain:main"
+install-skills = "gb_ai_brain.install_skills.main:main"
+
+[tool.coverage.run]
+omit = [
+    "**/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "# pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@abstractmethod",
+    "\\.\\.\\.",
+    "pass",
+]
+exclude_also = [
+    "class .*\\(.*Protocol.*\\):",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=gb_ai_brain",
+    "--cov-report=term-missing",
+    "--cov-fail-under=80",
+]
+markers = [
+    "unit: Unit tests (no external dependencies)",
+    "integration: Integration tests (uses real filesystem / external tools)",
+]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
