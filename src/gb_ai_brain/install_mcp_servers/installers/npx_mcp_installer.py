@@ -29,9 +29,11 @@ class NpxMcpInstaller:
         print(f"Installing MCP server '{server.name}' via npx: {pkg}")
 
         result = subprocess.run(
-            [self._npx_command, "--package", pkg, "--", "true"],
+            [self._npx_command, "--force", "--package", pkg, "--", "true"],
             check=False,
             stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         if result.returncode != 0:
             print(f"MCP server '{server.name}': npx install failed")
