@@ -38,9 +38,11 @@ class TestUvxMcpInstaller:
             result = installer.install(_server())
             assert result is True
             mock_run.assert_called_once_with(
-                ["uvx", "--quiet", "mcp-server-fetch", "--help"],
+                ["uvx", "--reinstall", "--quiet", "mcp-server-fetch", "--help"],
                 check=False,
                 stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
             )
 
     @pytest.mark.unit
