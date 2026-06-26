@@ -25,9 +25,11 @@ class UvxMcpInstaller:
         print(f"Installing MCP server '{server.name}' via uvx: {pkg}")
 
         result = subprocess.run(
-            ["uvx", "--quiet", pkg, "--help"],
+            ["uvx", "--reinstall", "--quiet", pkg, "--help"],
             check=False,
             stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         if result.returncode != 0:
             print(f"MCP server '{server.name}': uvx install failed")
