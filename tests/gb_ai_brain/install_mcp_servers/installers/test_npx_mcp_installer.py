@@ -1,3 +1,4 @@
+import subprocess
 from unittest.mock import patch
 
 import pytest
@@ -30,6 +31,7 @@ class TestNpxMcpInstaller:
             mock_run.assert_called_once_with(
                 ["npx", "-y", "@modelcontextprotocol/server-memory"],
                 check=False,
+                stdin=subprocess.DEVNULL,
             )
 
     @pytest.mark.unit
