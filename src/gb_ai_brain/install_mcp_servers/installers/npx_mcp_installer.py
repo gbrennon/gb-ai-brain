@@ -1,3 +1,5 @@
+import subprocess
+
 from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
 from gb_ai_brain.shared_kernel.shell import shell_command_exists
 
@@ -14,9 +16,26 @@ class NpxMcpInstaller:
             )
             return False
 
-        args = " ".join(server.args)
-        print(
-            f"MCP server '{server.name}': '{self._npx_command}' found "
-            f"on PATH (package: {args})"
+        # Resolve the package name from args (skip -y, --yes flags)
+        pkg_args = [a for a in server.args if not a.startswith("-")]
+        if not pkg_args:
+            print(
+                f"MCP server '{server.name}': no package name found "
+                f"in args {server.args}"
+            )
+            return False
+
+        pkg = pkg_args[0]
+        print(f"Installing MCP server '{server.name}' via npx: {pkg}")
+
+        result = subprocess.run(
+            [self._npx_command, "--package", pkg, "--", "true"],
+            check=False,
+            stdin=subprocess.DEVNULL,
         )
+        if result.returncode != 0:
+            print(f"MCP server '{server.name}': npx install failed")
+            return False
+
+        print(f"MCP server '{server.name}': installed")
         return True
