@@ -14,6 +14,7 @@ from gb_ai_brain.install_mcp_servers.installers.http_mcp_installer import (
 )
 from gb_ai_brain.install_mcp_servers.installers.install_mcp import install_mcp
 from gb_ai_brain.install_mcp_servers.parsing.load_mcp_json import load_mcp_json
+from gb_ai_brain.install_mcp_servers.secrets import check_mcp_secrets
 from gb_ai_brain.install_mcp_servers.main import main
 
 __all__ = [
@@ -25,5 +26,6 @@ __all__ = [
     "HttpMcpInstaller",
     "install_mcp",
     "load_mcp_json",
+    "check_mcp_secrets",
     "main",
 ]
