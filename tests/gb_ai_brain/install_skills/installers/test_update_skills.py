@@ -1,3 +1,4 @@
+import subprocess
 from unittest.mock import patch
 
 import pytest
@@ -15,6 +16,7 @@ class TestUpdateSkills:
             mock_run.assert_called_once_with(
                 ["npx", "skills", "update"],
                 check=False,
+                stdin=subprocess.DEVNULL,
             )
 
     @pytest.mark.unit
