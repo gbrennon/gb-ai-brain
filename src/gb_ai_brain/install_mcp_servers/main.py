@@ -45,7 +45,7 @@ def main(
         NpxMcpInstaller(),
         UvxMcpInstaller(),
         CommandMcpInstaller(),
-        HttpMcpInstaller(),
+        HttpMcpInstaller(dotenv_path=dotenv),
         servers,
     )
 
