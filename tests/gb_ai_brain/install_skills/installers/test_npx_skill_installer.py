@@ -9,7 +9,7 @@ from gb_ai_brain.install_skills.installers.npx_skill_installer import NpxSkillIn
 class TestNpxSkillInstaller:
     @pytest.mark.unit
     def test_npx_install_when_subprocess_succeeds_then_returns_true(self) -> None:
-        with patch("gb_ai_brain.install_skills.shell.subprocess.run") as mock_run:
+        with patch("gb_ai_brain.shared_kernel.shell.subprocess.run") as mock_run:
             mock_run.return_value.returncode = 0
             installer = NpxSkillInstaller()
             skill = SkillDef(
@@ -34,7 +34,7 @@ class TestNpxSkillInstaller:
 
     @pytest.mark.unit
     def test_npx_install_when_subprocess_fails_then_returns_false(self) -> None:
-        with patch("gb_ai_brain.install_skills.shell.subprocess.run") as mock_run:
+        with patch("gb_ai_brain.shared_kernel.shell.subprocess.run") as mock_run:
             mock_run.return_value.returncode = 1
             installer = NpxSkillInstaller(npx_command="npx")
             skill = SkillDef(
@@ -46,7 +46,7 @@ class TestNpxSkillInstaller:
 
     @pytest.mark.unit
     def test_npx_install_when_custom_npx_path_uses_it(self) -> None:
-        with patch("gb_ai_brain.install_skills.shell.subprocess.run") as mock_run:
+        with patch("gb_ai_brain.shared_kernel.shell.subprocess.run") as mock_run:
             mock_run.return_value.returncode = 0
             installer = NpxSkillInstaller(npx_command="/custom/npx")
             skill = SkillDef(
