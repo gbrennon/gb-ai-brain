@@ -38,9 +38,11 @@ class TestNpxMcpInstaller:
             result = installer.install(_server())
             assert result is True
             mock_run.assert_called_once_with(
-                ["npx", "--package", "pkg", "--", "true"],
+                ["npx", "--force", "--package", "pkg", "--", "true"],
                 check=False,
                 stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
             )
 
     @pytest.mark.unit
