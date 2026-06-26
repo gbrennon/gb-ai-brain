@@ -1,3 +1,4 @@
+import subprocess
 from unittest.mock import patch
 
 import pytest
@@ -30,6 +31,7 @@ class TestNpxSkillInstaller:
                     "-y",
                 ],
                 check=False,
+                stdin=subprocess.DEVNULL,
             )
 
     @pytest.mark.unit
