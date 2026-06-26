@@ -15,10 +15,15 @@ from gb_ai_brain.install_mcp_servers.installers.uvx_mcp_installer import (
     UvxMcpInstaller,
 )
 from gb_ai_brain.install_mcp_servers.parsing.load_mcp_json import load_mcp_json
+from gb_ai_brain.install_mcp_servers.secrets import check_mcp_secrets
 
 
-def main(mcp_json_path: Path | None = None) -> int:
+def main(
+    mcp_json_path: Path | None = None,
+    dotenv_path: Path | None = None,
+) -> int:
     mcp_json = mcp_json_path or Path("mcp") / "mcp.json"
+    dotenv = dotenv_path or Path(".env")
 
     if not mcp_json.exists():
         print(f"{mcp_json} not found")
@@ -29,6 +34,12 @@ def main(mcp_json_path: Path | None = None) -> int:
     if not servers:
         print("No MCP servers configured")
         return 0
+
+    missing_keys = check_mcp_secrets(servers, dotenv_path=dotenv)
+    if missing_keys:
+        print("\nMissing secrets — add these to .env or your environment:")
+        for key in missing_keys:
+            print(f" - {key}")
 
     failed = install_mcp(
         NpxMcpInstaller(),
@@ -43,6 +54,9 @@ def main(mcp_json_path: Path | None = None) -> int:
         for name in failed:
             print(f" - {name}")
         return 1
+
+    if missing_keys:
+        print("\nAll commands found, but secrets are missing (see above)")
 
     print("\nAll MCP servers installed successfully")
     return 0
