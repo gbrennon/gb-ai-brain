@@ -1,4 +1,4 @@
-from gb_ai_brain.install_skills.shell import run_command
+from gb_ai_brain.shared_kernel.shell import run_command
 
 
 def update_skills() -> bool:
