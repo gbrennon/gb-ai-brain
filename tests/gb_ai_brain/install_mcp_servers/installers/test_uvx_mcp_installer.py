@@ -1,4 +1,3 @@
-import subprocess
 from unittest.mock import patch
 
 import pytest
@@ -11,11 +10,11 @@ from gb_ai_brain.install_mcp_servers.installers.uvx_mcp_installer import (
 
 class TestUvxMcpInstaller:
     @pytest.mark.unit
-    def test_uvx_install_when_subprocess_succeeds_then_returns_true(self) -> None:
+    def test_uvx_install_when_on_path_then_returns_true(self) -> None:
         with patch(
-            "gb_ai_brain.shared_kernel.shell.subprocess.run"
-        ) as mock_run:
-            mock_run.return_value.returncode = 0
+            "gb_ai_brain.shared_kernel.shell.which"
+        ) as mock_which:
+            mock_which.return_value = "/usr/bin/uvx"
             installer = UvxMcpInstaller()
             server = McpServerDef(
                 name="fetch",
@@ -28,18 +27,14 @@ class TestUvxMcpInstaller:
             )
             result = installer.install(server)
             assert result is True
-            mock_run.assert_called_once_with(
-                ["uvx", "mcp-server-fetch"],
-                check=False,
-                stdin=subprocess.DEVNULL,
-            )
+            mock_which.assert_called_once_with("uvx")
 
     @pytest.mark.unit
-    def test_uvx_install_when_subprocess_fails_then_returns_false(self) -> None:
+    def test_uvx_install_when_not_on_path_then_returns_false(self) -> None:
         with patch(
-            "gb_ai_brain.shared_kernel.shell.subprocess.run"
-        ) as mock_run:
-            mock_run.return_value.returncode = 1
+            "gb_ai_brain.shared_kernel.shell.which"
+        ) as mock_which:
+            mock_which.return_value = None
             installer = UvxMcpInstaller()
             server = McpServerDef(
                 name="fail",
