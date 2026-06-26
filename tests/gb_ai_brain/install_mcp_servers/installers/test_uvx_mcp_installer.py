@@ -1,3 +1,4 @@
+import subprocess
 from unittest.mock import patch
 
 import pytest
@@ -30,6 +31,7 @@ class TestUvxMcpInstaller:
             mock_run.assert_called_once_with(
                 ["uvx", "mcp-server-fetch"],
                 check=False,
+                stdin=subprocess.DEVNULL,
             )
 
     @pytest.mark.unit
