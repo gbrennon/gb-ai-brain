@@ -7,14 +7,14 @@ from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
 from gb_ai_brain.install_mcp_servers.parsing.load_mcp_json import load_mcp_json
 
 
-class ConfigManager:
-    def __init__(self, platform: str = "linux") -> None:
-        self.platform = platform
+class ConfigPaths:
+    """Discovers standard MCP config file locations on each platform."""
 
-    def get_standard_config_paths(self) -> List[Path]:
+    @staticmethod
+    def get_standard_config_paths(platform: str) -> List[Path]:
         paths: List[Path] = []
 
-        if self.platform == "windows":
+        if platform == "windows":
             appdata = os.environ.get("APPDATA")
             if appdata:
                 paths.append(Path(appdata) / "mcp" / "mcp.json")
@@ -29,17 +29,21 @@ class ConfigManager:
             paths.append(Path.home() / ".mcp.json")
             paths.append(Path(".mcp") / "mcp.json")
 
-            if self.platform == "linux":
+            if platform == "linux":
                 paths.append(Path("/etc/opt/mcp/config.json"))
         return paths
 
-    def find_config_files(self) -> List[Path]:
-        standard_paths = self.get_standard_config_paths()
-        existing_paths = [path for path in standard_paths if path.exists()]
-        return existing_paths
 
-    def load_config_hierarchy(self) -> Dict[str, Any]:
-        config_files = self.find_config_files()
+class ConfigLoader:
+    """Finds existing config files and merges them hierarchically."""
+
+    @staticmethod
+    def find_config_files(platform: str) -> List[Path]:
+        standard_paths = ConfigPaths.get_standard_config_paths(platform)
+        return [path for path in standard_paths if path.exists()]
+
+    @staticmethod
+    def load_config_hierarchy(config_files: List[Path]) -> Dict[str, Any]:
         merged_config: Dict[str, Any] = {}
 
         for config_file in reversed(config_files):
@@ -54,10 +58,14 @@ class ConfigManager:
             except (json.JSONDecodeError, IOError) as e:
                 print(f"Warning: Could not load config file {config_file}: {e}")
 
-        merged_config = self._apply_env_overrides(merged_config)
         return merged_config
 
-    def _apply_env_overrides(self, config: Dict[str, Any]) -> Dict[str, Any]:
+
+class EnvOverrideApplier:
+    """Applies MCP_CONFIG_PATH environment variable overrides to a config dict."""
+
+    @staticmethod
+    def apply_env_overrides(config: Dict[str, Any]) -> Dict[str, Any]:
         override_config_path = os.environ.get("MCP_CONFIG_PATH")
         if override_config_path and Path(override_config_path).exists():
             try:
@@ -73,9 +81,12 @@ class ConfigManager:
                 print(f"Warning: Could not load env config file {override_config_path}: {e}")
         return config
 
-    def get_servers_from_config(self) -> List[McpServerDef]:
-        config = self.load_config_hierarchy()
 
+class ServerConfigParser:
+    """Parses a merged config dict into McpServerDef instances."""
+
+    @staticmethod
+    def get_servers_from_config(config: Dict[str, Any]) -> List[McpServerDef]:
         if "mcpServers" not in config:
             return []
 
@@ -97,5 +108,37 @@ class ConfigManager:
             ))
         return result
 
+
+class ConfigManager:
+    """Facade coordinating config discovery, loading, overrides, and parsing.
+
+    Uses ConfigPaths, ConfigLoader, EnvOverrideApplier, and ServerConfigParser
+    internally while preserving the same public API for backward compatibility.
+    """
+
+    def __init__(self, platform: str = "linux") -> None:
+        self.platform = platform
+
+    def get_standard_config_paths(self) -> List[Path]:
+        return ConfigPaths.get_standard_config_paths(self.platform)
+
+    def find_config_files(self) -> List[Path]:
+        standard_paths = self.get_standard_config_paths()
+        return [path for path in standard_paths if path.exists()]
+
+    def load_config_hierarchy(self) -> Dict[str, Any]:
+        config_files = self.find_config_files()
+        merged_config = ConfigLoader.load_config_hierarchy(config_files)
+        merged_config = self._apply_env_overrides(merged_config)
+        return merged_config
+
+    def _apply_env_overrides(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        return EnvOverrideApplier.apply_env_overrides(config)
+
+    def get_servers_from_config(self) -> List[McpServerDef]:
+        config = self.load_config_hierarchy()
+        return ServerConfigParser.get_servers_from_config(config)
+
     def load_from_file(self, file_path: Path) -> List[McpServerDef]:
         return load_mcp_json(file_path)
+
