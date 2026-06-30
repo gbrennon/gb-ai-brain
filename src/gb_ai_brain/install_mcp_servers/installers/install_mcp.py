@@ -7,6 +7,9 @@ def install_mcp(
     uvx_installer: McpInstaller,
     command_installer: McpInstaller,
     http_installer: McpInstaller,
+    opencode_installer: McpInstaller,
+    pi_installer: McpInstaller,
+    vibe_installer: McpInstaller,
     servers: list[McpServerDef],
 ) -> list[str]:
     failed: list[str] = []
@@ -16,8 +19,16 @@ def install_mcp(
             print(f"Skipping disabled MCP server: {server.name}")
             continue
 
+        platform = server.platform if hasattr(server, 'platform') else None
+
         if server.server_type == "streamableHttp":
             success = http_installer.install(server)
+        elif platform == "opencode":
+            success = opencode_installer.install(server)
+        elif platform == "pi":
+            success = pi_installer.install(server)
+        elif platform == "vibe":
+            success = vibe_installer.install(server)
         elif server.command == "npx":
             success = npx_installer.install(server)
         elif server.command == "uvx":
