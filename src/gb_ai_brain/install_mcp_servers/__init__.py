@@ -1,3 +1,4 @@
+from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
 from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
 from gb_ai_brain.install_mcp_servers.installers.mcp_installer import McpInstaller
 from gb_ai_brain.install_mcp_servers.installers.npx_mcp_installer import (
@@ -19,6 +20,7 @@ from gb_ai_brain.install_mcp_servers.secrets import check_mcp_secrets
 from gb_ai_brain.install_mcp_servers.main import main
 
 __all__ = [
+    "AgentPlatform",
     "McpServerDef",
     "McpInstaller",
     "NpxMcpInstaller",
