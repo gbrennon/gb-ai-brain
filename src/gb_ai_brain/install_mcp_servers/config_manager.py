@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -8,26 +9,42 @@ from gb_ai_brain.install_mcp_servers.parsing.load_mcp_json import load_mcp_json
 from gb_ai_brain.install_mcp_servers.server_config_parser import ServerConfigParser
 
 
+@dataclass
+class ConfigDependencies:
+    """Grouped constructor dependencies for ConfigManager.
+
+    Defaults wire the real implementations.  Pass a custom instance to
+    inject mocks for testing.
+    """
+
+    config_paths: ConfigPaths = field(default_factory=ConfigPaths)
+    config_loader: ConfigLoader | None = None
+    env_override_applier: EnvOverrideApplier = field(default_factory=EnvOverrideApplier)
+    server_config_parser: ServerConfigParser = field(default_factory=ServerConfigParser)
+
+    def __post_init__(self) -> None:
+        if self.config_loader is None:
+            self.config_loader = ConfigLoader(self.config_paths)
+
+
 class ConfigManager:
     """Facade coordinating config discovery, loading, overrides, and parsing.
 
-    Accepts optional dependency instances via constructor injection for
-    testability.  Defaults to the real implementations when not provided.
+    Construct with ``ConfigManager()`` for defaults, or inject a
+    ``ConfigDependencies`` instance for testability.
     """
 
     def __init__(
         self,
         platform: str = "linux",
-        config_paths: ConfigPaths | None = None,
-        config_loader: ConfigLoader | None = None,
-        env_override_applier: EnvOverrideApplier | None = None,
-        server_config_parser: ServerConfigParser | None = None,
+        deps: ConfigDependencies | None = None,
     ) -> None:
         self.platform = platform
-        self._config_paths = config_paths or ConfigPaths()
-        self._config_loader = config_loader or ConfigLoader(self._config_paths)
-        self._env_override_applier = env_override_applier or EnvOverrideApplier()
-        self._server_config_parser = server_config_parser or ServerConfigParser()
+        d = deps or ConfigDependencies()
+        self._config_paths = d.config_paths
+        self._config_loader = d.config_loader
+        self._env_override_applier = d.env_override_applier
+        self._server_config_parser = d.server_config_parser
 
     def get_standard_config_paths(self) -> List[Path]:
         return self._config_paths.get_standard_config_paths(self.platform)
