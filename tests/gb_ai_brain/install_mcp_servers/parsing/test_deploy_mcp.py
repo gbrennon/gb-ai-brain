@@ -138,3 +138,93 @@ class TestDeployMcp:
         written = json.loads(target.read_text())
         assert written["mcpServers"]["srv"]["autoApprove"] == []
         assert written["mcpServers"]["srv"]["disabled"] is False
+
+    # ---- multi-agent deployment tests ----
+
+    @pytest.mark.unit
+    def test_agent_targets_filters_servers_by_platform(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
+
+        source = tmp_path / "mcp.json"
+        source.write_text(
+            '{"mcpServers":{'
+            '"shared":{"command":"npx","args":["shared-pkg"]},'
+            '"oc-srv":{"command":"npx","args":["oc-pkg"],"platform":"opencode"},'
+            '"pi-srv":{"command":"npx","args":["pi-pkg"],"platform":"pi"}'
+            '}}'
+        )
+        primary = tmp_path / "cline.json"
+        oc_target = tmp_path / "opencode.json"
+        pi_target = tmp_path / "pi.json"
+
+        result = deploy_mcp(
+            source,
+            primary,
+            agent_targets={AgentPlatform.OPENCODE: oc_target, AgentPlatform.PI: pi_target},
+        )
+        assert result is True
+
+        # Primary target gets everything
+        primary_data = json.loads(primary.read_text())
+        assert set(primary_data["mcpServers"].keys()) == {"shared", "oc-srv", "pi-srv"}
+
+        # OpenCode target gets shared + opencode-only
+        oc_data = json.loads(oc_target.read_text())
+        assert set(oc_data["mcpServers"].keys()) == {"shared", "oc-srv"}
+
+        # Pi target gets shared + pi-only
+        pi_data = json.loads(pi_target.read_text())
+        assert set(pi_data["mcpServers"].keys()) == {"shared", "pi-srv"}
+
+    @pytest.mark.unit
+    def test_agent_targets_when_no_platforms_then_all_get_same_servers(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
+
+        source = tmp_path / "mcp.json"
+        source.write_text(
+            '{"mcpServers":{"a":{"command":"npx","args":["a"]},"b":{"command":"npx","args":["b"]}}}'
+        )
+        primary = tmp_path / "cline.json"
+        oc_target = tmp_path / "opencode.json"
+
+        result = deploy_mcp(
+            source,
+            primary,
+            agent_targets={AgentPlatform.OPENCODE: oc_target},
+        )
+        assert result is True
+
+        oc_data = json.loads(oc_target.read_text())
+        assert set(oc_data["mcpServers"].keys()) == {"a", "b"}
+
+    @pytest.mark.unit
+    def test_agent_targets_preserves_root_keys(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
+
+        source = tmp_path / "mcp.json"
+        source.write_text(
+            '{"other": "data", "mcpServers":{"srv":{"command":"npx","args":["pkg"],"platform":"opencode"}}}'
+        )
+        primary = tmp_path / "cline.json"
+        oc_target = tmp_path / "opencode.json"
+
+        result = deploy_mcp(
+            source,
+            primary,
+            agent_targets={AgentPlatform.OPENCODE: oc_target},
+        )
+        assert result is True
+
+        oc_data = json.loads(oc_target.read_text())
+        assert oc_data["other"] == "data"
+        assert "srv" in oc_data["mcpServers"]
+
