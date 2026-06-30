@@ -1,15 +1,16 @@
 import subprocess
 
+from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
 from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
 from gb_ai_brain.shared_kernel.shell import shell_command_exists
 
 
 class VibeMcpInstaller:
-    def __init__(self, platform: str = "vibe") -> None:
+    def __init__(self, platform: str = AgentPlatform.VIBE) -> None:
         self.platform = platform
 
     def install(self, server: McpServerDef) -> bool:
-        if self.platform == "vibe":
+        if self.platform == AgentPlatform.VIBE:
             if not shell_command_exists("vibe-install"):
                 print(
                     f"MCP server '{server.name}' requires 'vibe-install' "
