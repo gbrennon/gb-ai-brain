@@ -18,7 +18,6 @@ class ConfigManager:
     def __init__(
         self,
         platform: str = "linux",
-        *,
         config_paths: ConfigPaths | None = None,
         config_loader: ConfigLoader | None = None,
         env_override_applier: EnvOverrideApplier | None = None,
