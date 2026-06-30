@@ -39,13 +39,7 @@ class TestDeployMcp:
     ) -> None:
         monkeypatch.delenv("MY_TOKEN", raising=False)
         source = tmp_path / "mcp.json"
-        source.write_text(json.dumps({
-            "mcpServers": {
-                "srv": {
-                    "env": {"MY_TOKEN": "YOUR_TOKEN_HERE"},
-                },
-            },
-        }))
+        source.write_text('{"mcpServers":{"srv":{"env":{"MY_TOKEN":"{{ MY_TOKEN or \'YOUR_TOKEN_HERE\' }}"}}}}')
         dotenv = tmp_path / ".env"
         dotenv.write_text("MY_TOKEN=real_value\n")
         target = tmp_path / "out.json"
@@ -63,13 +57,7 @@ class TestDeployMcp:
     ) -> None:
         monkeypatch.setenv("MY_TOKEN", "from_environ")
         source = tmp_path / "mcp.json"
-        source.write_text(json.dumps({
-            "mcpServers": {
-                "srv": {
-                    "env": {"MY_TOKEN": "PLACEHOLDER"},
-                },
-            },
-        }))
+        source.write_text('{"mcpServers":{"srv":{"env":{"MY_TOKEN":"{{ MY_TOKEN or \'PLACEHOLDER\' }}"}}}}')
         target = tmp_path / "out.json"
 
         result = deploy_mcp(source, target, dotenv_path=None)
@@ -83,13 +71,7 @@ class TestDeployMcp:
         tmp_path: Path,
     ) -> None:
         source = tmp_path / "mcp.json"
-        source.write_text(json.dumps({
-            "mcpServers": {
-                "srv": {
-                    "env": {"KEY": "already_real"},
-                },
-            },
-        }))
+        source.write_text('{"mcpServers":{"srv":{"env":{"KEY":"already_real"}}}}')
         target = tmp_path / "out.json"
 
         result = deploy_mcp(source, target)
@@ -98,22 +80,17 @@ class TestDeployMcp:
         assert written["mcpServers"]["srv"]["env"]["KEY"] == "already_real"
 
     @pytest.mark.unit
-    def test_deploy_when_header_your_token_here_resolved_from_environ(
+    def test_deploy_when_header_placeholder_resolved_from_environ(
         self,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setenv("GITHUB_TOKEN", "ghp_real")
         source = tmp_path / "mcp.json"
-        source.write_text(json.dumps({
-            "mcpServers": {
-                "github": {
-                    "headers": {
-                        "Authorization": "Bearer YOUR_GITHUB_TOKEN_HERE",
-                    },
-                },
-            },
-        }))
+        source.write_text(
+            '{"mcpServers":{"github":{"headers":{' +
+            '"Authorization":"Bearer {{ GITHUB_TOKEN or \'YOUR_GITHUB_TOKEN_HERE\' }}"}}}}'
+        )
         target = tmp_path / "out.json"
 
         result = deploy_mcp(source, target)
@@ -125,22 +102,17 @@ class TestDeployMcp:
         )
 
     @pytest.mark.unit
-    def test_deploy_when_header_still_placeholder_then_keeps_it(
+    def test_deploy_when_header_placeholder_unresolved_then_keeps_fallback(
         self,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.delenv("GITHUB_TOKEN", raising=False)
         source = tmp_path / "mcp.json"
-        source.write_text(json.dumps({
-            "mcpServers": {
-                "github": {
-                    "headers": {
-                        "Authorization": "Bearer YOUR_GITHUB_TOKEN_HERE",
-                    },
-                },
-            },
-        }))
+        source.write_text(
+            '{"mcpServers":{"github":{"headers":{' +
+            '"Authorization":"Bearer {{ GITHUB_TOKEN or \'YOUR_GITHUB_TOKEN_HERE\' }}"}}}}'
+        )
         target = tmp_path / "out.json"
 
         result = deploy_mcp(source, target)
@@ -157,15 +129,9 @@ class TestDeployMcp:
         tmp_path: Path,
     ) -> None:
         source = tmp_path / "mcp.json"
-        source.write_text(json.dumps({
-            "mcpServers": {
-                "srv": {
-                    "command": "npx",
-                    "autoApprove": [],
-                    "disabled": False,
-                },
-            },
-        }))
+        source.write_text(
+            '{"mcpServers":{"srv":{"command":"npx","autoApprove":[],"disabled":false}}}'
+        )
         target = tmp_path / "out.json"
 
         deploy_mcp(source, target)
