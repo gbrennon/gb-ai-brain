@@ -24,6 +24,7 @@ def load_mcp_json(file_path: Path) -> list[McpServerDef]:
             server_type=cfg.get("type"),
             url=cfg.get("url"),
             disabled=cfg.get("disabled", False),
+            platform=cfg.get("platform"),
         ))
 
     return result
