@@ -35,7 +35,6 @@ class HttpMcpInstaller:
             )
             return True
 
-        # Check env keys for real values
         for key, raw_value in server.env:
             real_value = os.environ.get(key) or self._dotenv.get(key)
             if real_value and not _is_placeholder(real_value):
@@ -45,7 +44,6 @@ class HttpMcpInstaller:
                 )
                 return True
 
-        # Value is still a placeholder
         print(
             f"MCP server '{server.name}' is streamableHttp ({url}) — "
             f"no local install needed (secrets unresolved in env)"
