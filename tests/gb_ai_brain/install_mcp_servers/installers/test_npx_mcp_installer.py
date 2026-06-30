@@ -18,13 +18,12 @@ class TestNpxMcpInstaller:
             patch("gb_ai_brain.shared_kernel.shell.which", return_value="/usr/bin/npx"),
             patch("gb_ai_brain.install_mcp_servers.installers.npx_mcp_installer.subprocess.run") as mock_run,
         ):
-            mock_run.return_value.returncode = 0
             installer = NpxMcpInstaller()
             result = installer.install(npx_server)
             assert result is True
             mock_run.assert_called_once_with(
                 ["npx", "--force", "--package", "pkg", "--", "true"],
-                check=False, stdin=subprocess.DEVNULL,
+                check=True, stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             )
 
@@ -47,7 +46,9 @@ class TestNpxMcpInstaller:
             patch("gb_ai_brain.shared_kernel.shell.which", return_value="/usr/bin/npx"),
             patch("gb_ai_brain.install_mcp_servers.installers.npx_mcp_installer.subprocess.run") as mock_run,
         ):
-            mock_run.return_value.returncode = 1
+            mock_run.side_effect = subprocess.CalledProcessError(
+                1, ["npx", "--force", "--package", "broken", "--", "true"],
+            )
             installer = NpxMcpInstaller()
             result = installer.install(server)
             assert result is False
