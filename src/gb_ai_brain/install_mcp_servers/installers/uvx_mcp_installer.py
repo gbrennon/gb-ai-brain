@@ -13,15 +13,15 @@ class UvxMcpInstaller:
             )
             return False
 
-        pkg_args = [a for a in server.args if not a.startswith("-")]
-        if not pkg_args:
+        non_flag_args = [a for a in server.args if not a.startswith("-")]
+        if not non_flag_args:
             print(
                 f"MCP server '{server.name}': no package name found "
                 f"in args {server.args}"
             )
             return False
 
-        pkg = pkg_args[0]
+        pkg = non_flag_args[0]
         print(f"Installing MCP server '{server.name}' via uvx: {pkg}")
 
         result = subprocess.run(
