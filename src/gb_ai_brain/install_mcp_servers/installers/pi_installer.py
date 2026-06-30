@@ -1,15 +1,16 @@
 import subprocess
 
+from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
 from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
 from gb_ai_brain.shared_kernel.shell import shell_command_exists
 
 
 class PiMcpInstaller:
-    def __init__(self, platform: str = "pi") -> None:
+    def __init__(self, platform: str = AgentPlatform.PI) -> None:
         self.platform = platform
 
     def install(self, server: McpServerDef) -> bool:
-        if self.platform == "pi":
+        if self.platform == AgentPlatform.PI:
             if not shell_command_exists("pi-install"):
                 print(
                     f"MCP server '{server.name}' requires 'pi-install' "
