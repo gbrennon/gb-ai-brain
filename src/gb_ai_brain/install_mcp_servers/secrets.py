@@ -9,15 +9,6 @@ def check_mcp_secrets(
     servers: list[McpServerDef],
     dotenv_path: Path | None = None,
 ) -> list[str]:
-    """Verify that every server's env keys have a secret value.
-
-    Priority:
-    1. os.environ (runtime)
-    2. .env file (development)
-
-    Returns list of missing env keys like ["GITHUB_TOKEN", "FORGEJO_ACCESS_TOKEN"].
-    An empty list means every key was found.
-    """
     dotenv_vars: dict[str, str] = {}
     if dotenv_path is not None:
         dotenv_vars = load_dotenv(dotenv_path)
@@ -28,8 +19,9 @@ def check_mcp_secrets(
         if server.disabled:
             continue
         for key, _value in server.env:
-            # Priority: os.environ > dotenv file
-            real_value = os.environ.get(key) or dotenv_vars.get(key)
+            runtime_value = os.environ.get(key)
+            file_value = dotenv_vars.get(key)
+            real_value = runtime_value if runtime_value else file_value
             if not real_value:
                 missing.append(key)
 
