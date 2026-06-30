@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
+    "jinja2>=3.1.0",
     "pyyaml>=6.0.3",
 ]
 
@@ -20,6 +21,7 @@ dev = [
 [project.scripts]
 gb-ai-brain = "gb_ai_brain:main"
 install-skills = "gb_ai_brain.install_skills.main:main"
+install-mcp-servers = "gb_ai_brain.install_mcp_servers.main:main"
 
 [tool.coverage.run]
 omit = [

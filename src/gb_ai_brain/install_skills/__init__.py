@@ -13,7 +13,7 @@ from gb_ai_brain.install_skills.parsing.parse_skill_name_from_markdown import (
     parse_skill_name_from_markdown,
 )
 from gb_ai_brain.install_skills.parsing.list_local_skills import list_local_skills
-from gb_ai_brain.install_skills.shell import shell_command_exists, run_command
+from gb_ai_brain.shared_kernel.shell import shell_command_exists, run_command
 from gb_ai_brain.install_skills.main import main
 
 __all__ = [

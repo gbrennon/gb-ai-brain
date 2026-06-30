@@ -1,6 +1,6 @@
 from gb_ai_brain.install_skills.models.skill_def import SkillDef
 from gb_ai_brain.install_skills.installers.skill_installer import SkillInstaller
-from gb_ai_brain.install_skills.shell import run_command
+from gb_ai_brain.shared_kernel.shell import run_command
 
 
 class NpxSkillInstaller:

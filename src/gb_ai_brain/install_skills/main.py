@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from gb_ai_brain.install_skills.shell import shell_command_exists
+from gb_ai_brain.shared_kernel.shell import shell_command_exists
 from gb_ai_brain.install_skills.installers.skill_installer import SkillInstaller
 from gb_ai_brain.install_skills.installers.npx_skill_installer import NpxSkillInstaller
 from gb_ai_brain.install_skills.installers.local_skill_installer import LocalSkillInstaller
