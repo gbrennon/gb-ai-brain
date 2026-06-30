@@ -56,7 +56,9 @@ def _resolve_value(key: str, raw_value: str, dotenv_vars: dict[str, str]) -> str
     if not _PLACEHOLDER_RE.search(raw_value):
         return raw_value
 
-    real = os.environ.get(key) or dotenv_vars.get(key)
+    real = os.environ.get(key)
+    if real is None:
+        real = dotenv_vars.get(key)
     return real if real else raw_value
 
 
@@ -75,7 +77,9 @@ def _resolve_in_string(template: str, dotenv_vars: dict[str, str]) -> str:
             f"{captured_name}_SECRET",
         ])
         for candidate_key in candidates:
-            real = os.environ.get(candidate_key) or dotenv_vars.get(candidate_key, "")
+            real = os.environ.get(candidate_key)
+            if real is None:
+                real = dotenv_vars.get(candidate_key)
             if real:
                 return template.replace(match.group(0), real)
 
@@ -83,7 +87,9 @@ def _resolve_in_string(template: str, dotenv_vars: dict[str, str]) -> str:
         if len(env_key) < 3:
             continue
         if env_key in template:
-            real = os.environ.get(env_key) or dotenv_vars.get(env_key, "")
+            real = os.environ.get(env_key)
+            if real is None:
+                real = dotenv_vars.get(env_key)
             if real:
                 return template.replace(env_key, real)
 
