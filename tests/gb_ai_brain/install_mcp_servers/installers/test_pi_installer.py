@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
+from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
 from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
 from gb_ai_brain.install_mcp_servers.installers.pi_installer import PiMcpInstaller
 
@@ -19,7 +20,7 @@ class TestPiMcpInstaller:
         self, npx_server: McpServerDef,
     ) -> None:
         with patch("gb_ai_brain.shared_kernel.shell.which", return_value=None):
-            installer = PiMcpInstaller(platform="pi")
+            installer = PiMcpInstaller(platform=AgentPlatform.PI)
             result = installer.install(npx_server)
             assert result is False
 
@@ -32,7 +33,7 @@ class TestPiMcpInstaller:
             patch("gb_ai_brain.install_mcp_servers.installers.pi_installer.subprocess.run") as mock_run,
         ):
             mock_run.return_value.returncode = 0
-            installer = PiMcpInstaller(platform="pi")
+            installer = PiMcpInstaller(platform=AgentPlatform.PI)
             result = installer.install(npx_server)
             assert result is True
             mock_run.assert_called_once_with(
@@ -52,6 +53,6 @@ class TestPiMcpInstaller:
             patch("gb_ai_brain.install_mcp_servers.installers.pi_installer.subprocess.run") as mock_run,
         ):
             mock_run.return_value.returncode = 1
-            installer = PiMcpInstaller(platform="pi")
+            installer = PiMcpInstaller(platform=AgentPlatform.PI)
             result = installer.install(server)
             assert result is False
