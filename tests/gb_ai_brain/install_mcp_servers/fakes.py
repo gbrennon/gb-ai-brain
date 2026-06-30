@@ -1,14 +1,2 @@
-from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
+from tests.gb_ai_brain.install_mcp_servers.fixtures.fakes import FakeMcpInstaller  # noqa: F401
 
-
-class FakeMcpInstaller:
-    def __init__(self) -> None:
-        self.installed: list[McpServerDef] = []
-        self.fail_on: list[str] = []
-        self.skipped: list[str] = []
-
-    def install(self, server: McpServerDef) -> bool:
-        self.installed.append(server)
-        if server.name in self.fail_on:
-            return False
-        return True
