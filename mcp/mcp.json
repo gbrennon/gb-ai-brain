@@ -4,7 +4,7 @@
       "type": "streamableHttp",
       "url": "https://api.githubcopilot.com/mcp/",
       "headers": {
-        "Authorization": "Bearer YOUR_GITHUB_TOKEN_HERE"
+        "Authorization": "Bearer {{ GITHUB_TOKEN or 'YOUR_GITHUB_TOKEN_HERE' }}"
       },
       "disabled": false,
       "autoApprove": []
@@ -16,7 +16,7 @@
         "--url", "https://codeberg.org"
       ],
       "env": {
-        "FORGEJO_ACCESS_TOKEN": "YOUR_CODEBERG_TOKEN_HERE"
+        "FORGEJO_ACCESS_TOKEN": "{{ FORGEJO_ACCESS_TOKEN or 'YOUR_CODEBERG_TOKEN_HERE' }}"
       },
       "disabled": false,
       "autoApprove": []
