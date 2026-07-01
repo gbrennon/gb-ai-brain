@@ -1,4 +1,5 @@
 from gb_ai_brain.install_mcp_servers.installers.mcp_installer import McpInstaller
+from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
 from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
 
 
@@ -19,15 +20,15 @@ def install_mcp(
             print(f"Skipping disabled MCP server: {server.name}")
             continue
 
-        platform = server.platform if hasattr(server, 'platform') else None
+        platform = server.platform
 
         if server.server_type == "streamableHttp":
             success = http_installer.install(server)
-        elif platform == "opencode":
+        elif platform == AgentPlatform.OPENCODE:
             success = opencode_installer.install(server)
-        elif platform == "pi":
+        elif platform == AgentPlatform.PI:
             success = pi_installer.install(server)
-        elif platform == "vibe":
+        elif platform == AgentPlatform.VIBE:
             success = vibe_installer.install(server)
         elif server.command == "npx":
             success = npx_installer.install(server)

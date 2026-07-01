@@ -24,11 +24,20 @@ from gb_ai_brain.install_mcp_servers.installers.uvx_mcp_installer import (
 from gb_ai_brain.install_mcp_servers.installers.vibe_installer import (
     VibeMcpInstaller,
 )
-from gb_ai_brain.install_mcp_servers.parsing.deploy_mcp import deploy_mcp
+from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
+from gb_ai_brain.install_mcp_servers.parsing.deploy_mcp import (
+    _agent_target_path,
+    deploy_mcp,
+)
 from gb_ai_brain.install_mcp_servers.parsing.load_mcp_json import load_mcp_json
 from gb_ai_brain.install_mcp_servers.secrets import check_mcp_secrets
 
 _DEFAULT_TARGET = Path.home() / ".cline" / "data" / "settings" / "cline_mcp_settings.json"
+
+
+def _build_agent_targets() -> dict[AgentPlatform, Path]:
+    """Return config paths for every known agent platform."""
+    return {p: _agent_target_path(p) for p in AgentPlatform}
 
 
 def main(
@@ -83,7 +92,11 @@ def main(
     if missing_keys:
         print(f"\nAll commands found for platform {platform}, but secrets are missing (see above)")
 
-    deployed = deploy_mcp(mcp_json, target, dotenv_path=dotenv)
+    agent_targets = _build_agent_targets()
+
+    deployed = deploy_mcp(
+        mcp_json, target, dotenv_path=dotenv, agent_targets=agent_targets,
+    )
     if not deployed:
         print(f"\nFailed to deploy MCP config to {target} for platform {platform}")
         return 1

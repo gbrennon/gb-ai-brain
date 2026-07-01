@@ -1,4 +1,8 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
 
 
 @dataclass(frozen=True)
@@ -10,3 +14,4 @@ class McpServerDef:
     server_type: str | None
     url: str | None
     disabled: bool
+    platform: "AgentPlatform | None" = None

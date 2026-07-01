@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
+from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
 from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
 from gb_ai_brain.install_mcp_servers.installers.opencode_installer import (
     OpenCodeMcpInstaller,
@@ -21,7 +22,7 @@ class TestOpenCodeMcpInstaller:
         self, npx_server: McpServerDef,
     ) -> None:
         with patch("gb_ai_brain.shared_kernel.shell.which", return_value=None):
-            installer = OpenCodeMcpInstaller(platform="opencode")
+            installer = OpenCodeMcpInstaller(platform=AgentPlatform.OPENCODE)
             result = installer.install(npx_server)
             assert result is False
 
@@ -34,7 +35,7 @@ class TestOpenCodeMcpInstaller:
             patch("gb_ai_brain.install_mcp_servers.installers.opencode_installer.subprocess.run") as mock_run,
         ):
             mock_run.return_value.returncode = 0
-            installer = OpenCodeMcpInstaller(platform="opencode")
+            installer = OpenCodeMcpInstaller(platform=AgentPlatform.OPENCODE)
             result = installer.install(npx_server)
             assert result is True
             mock_run.assert_called_once_with(
@@ -54,6 +55,6 @@ class TestOpenCodeMcpInstaller:
             patch("gb_ai_brain.install_mcp_servers.installers.opencode_installer.subprocess.run") as mock_run,
         ):
             mock_run.return_value.returncode = 1
-            installer = OpenCodeMcpInstaller(platform="opencode")
+            installer = OpenCodeMcpInstaller(platform=AgentPlatform.OPENCODE)
             result = installer.install(server)
             assert result is False

@@ -93,3 +93,30 @@ class TestLoadMcpJson:
         )
         servers = load_mcp_json(p)
         assert servers[0].disabled is True
+
+    @pytest.mark.unit
+    def test_load_when_server_has_platform_then_parses_correctly(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
+
+        p = tmp_path / "mcp.json"
+        p.write_text(
+            '{"mcpServers": {"oc": {"command": "npx", '
+            '"args": ["pkg"], "platform": "opencode"}}}'
+        )
+        servers = load_mcp_json(p)
+        assert servers[0].platform == AgentPlatform.OPENCODE
+
+    @pytest.mark.unit
+    def test_load_when_server_has_no_platform_then_defaults_to_none(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        p = tmp_path / "mcp.json"
+        p.write_text(
+            '{"mcpServers": {"srv": {"command": "npx", "args": ["pkg"]}}}'
+        )
+        servers = load_mcp_json(p)
+        assert servers[0].platform is None

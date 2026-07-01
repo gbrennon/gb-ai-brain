@@ -1,15 +1,16 @@
 import subprocess
 
+from gb_ai_brain.install_mcp_servers.models.agent_platform import AgentPlatform
 from gb_ai_brain.install_mcp_servers.models.mcp_server_def import McpServerDef
 from gb_ai_brain.shared_kernel.shell import shell_command_exists
 
 
 class OpenCodeMcpInstaller:
-    def __init__(self, platform: str = "opencode") -> None:
+    def __init__(self, platform: str = AgentPlatform.OPENCODE) -> None:
         self.platform = platform
 
     def install(self, server: McpServerDef) -> bool:
-        if self.platform == "opencode":
+        if self.platform == AgentPlatform.OPENCODE:
             if not shell_command_exists("opencode"):
                 print(
                     f"MCP server '{server.name}' requires 'opencode' "
